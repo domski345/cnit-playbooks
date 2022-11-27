@@ -1,0 +1,28 @@
+---
+- name: "Get running config from IOS devices"
+  hosts: cnit445
+  become: yes
+  gather_facts: no
+
+  tasks:
+#    - name: Connect to Term server
+#      cisco.ios.ios_command:
+#        commands: ""
+#        wait_for: result[0] contains OK
+
+    - name: "Get device config"
+      ios_command:
+        commands:
+          - show running-config
+      register: result_config
+
+    - name: "Create output folder"
+      file:
+        path: "configs"
+        state: directory
+      run_once: true
+
+    - name: "Write config file"
+      copy:
+        content: "{{ result_config.stdout[0] }}\n"
+        dest: "configs/{{ inventory_hostname }}.cfg"
